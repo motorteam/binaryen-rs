@@ -1,0 +1,16 @@
+[package]
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+name = "binaryen-sys"
+links = "binaryen"
+
+[dependencies]
+
+[build-dependencies]
+bindgen = "0.71.1"
+cc = "1.0"
+cmake = "0.1"
+flate2 = "1.0.28"
+tar = "0.4.44"
+ureq = "3.0.8"
