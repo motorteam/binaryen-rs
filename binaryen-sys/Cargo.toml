@@ -9,8 +9,8 @@ links = "binaryen"
 
 [build-dependencies]
 bindgen = "0.71.1"
-cc = "1.0"
+cc = "1.2"
 cmake = "0.1"
-flate2 = "1.0.28"
-tar = "0.4.44"
-ureq = "3.0.8"
+flate2 = "1"
+tar = "0.4"
+ureq = "3"

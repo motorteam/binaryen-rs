@@ -2,7 +2,7 @@
 members = ["binaryen-sys"]
 
 [workspace.package]
-version = "0.122.0"
+version = "0.123.0"
 edition = "2024"
 publish = false
 
@@ -14,4 +14,4 @@ name = "binaryen"
 
 [dependencies]
 binaryen-sys = { path = "binaryen-sys" }
-libc = "0.2.145"
+libc = "0.2"

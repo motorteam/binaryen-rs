@@ -4,7 +4,12 @@ use std::path::PathBuf;
 
 fn main() {
     let out_dir = std::env::var("OUT_DIR").unwrap();
-    let binaryen_version = "version_122";
+
+    // Extract the minor version from the package version.
+    let version_str = std::env::var("CARGO_PKG_VERSION").unwrap();
+    let version = version_str.split('.').nth(1).unwrap();
+
+    let binaryen_version = format!("version_{}", version);
     let binaryen_release_url = format!(
         "https://github.com/WebAssembly/binaryen/archive/refs/tags/{}.tar.gz",
         binaryen_version

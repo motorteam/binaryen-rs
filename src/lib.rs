@@ -1,3 +1,5 @@
+use std::ffi::CString;
+
 use binaryen_sys::*;
 
 #[repr(transparent)]
@@ -16,20 +18,45 @@ impl Module {
         Self(module)
     }
 
-    pub fn optimize(&mut self, debug: bool, optimize_level: i32, shrink_level: i32) {
+    pub fn set_always_inline_max_size(&mut self, max_size: u32) {
+        unsafe { BinaryenSetAlwaysInlineMaxSize(max_size) };
+    }
+
+    pub fn set_one_caller_inline_max_size(&mut self, max_size: u32) {
+        unsafe { BinaryenSetOneCallerInlineMaxSize(max_size) };
+    }
+
+    pub fn set_debug_info(&mut self, debug: bool) {
+        unsafe { BinaryenSetDebugInfo(debug) };
+    }
+
+    pub fn set_optimize_level(&mut self, optimize_level: i32) {
+        unsafe { BinaryenSetOptimizeLevel(optimize_level) };
+    }
+
+    pub fn set_shrink_level(&mut self, shrink_level: i32) {
+        unsafe { BinaryenSetShrinkLevel(shrink_level) };
+    }
+
+    pub fn run_passes(&mut self, passes: &[&str]) {
+        let c_passes: Vec<CString> = passes.iter().map(|s| CString::new(*s).unwrap()).collect();
+
+        let mut ptrs: Vec<*const i8> = c_passes.iter().map(|cs| cs.as_ptr()).collect();
+
         unsafe {
-            BinaryenSetDebugInfo(debug);
-            BinaryenSetOptimizeLevel(optimize_level);
-            BinaryenSetShrinkLevel(shrink_level);
-            BinaryenModuleOptimize(self.0)
+            BinaryenModuleRunPasses(self.0, ptrs.as_mut_ptr(), ptrs.len().try_into().unwrap())
         };
     }
 
-    pub fn to_binary(self) -> Vec<u8> {
+    pub fn optimize(&mut self) {
+        unsafe { BinaryenModuleOptimize(self.0) };
+    }
+
+    pub fn into_binary(self) -> Vec<u8> {
         unsafe {
             let data = BinaryenModuleAllocateAndWrite(self.0, std::ptr::null());
-            let data_slice = std::slice::from_raw_parts(data.binary as *mut u8, data.binaryBytes);
-            let result = Vec::from(data_slice);
+            let result =
+                std::slice::from_raw_parts(data.binary as *mut u8, data.binaryBytes).to_vec();
             libc::free(data.binary as *mut libc::c_void);
             result
         }
